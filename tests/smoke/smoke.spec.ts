@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { HomePage } from '../../pages/HomePage';
+import { HomePage } from '../../pages/HomePage_Smoke';
 
 test.describe('OLX.ba - Smoke Testing Suite', () => {
     let homePage: HomePage;
