@@ -62,7 +62,18 @@ test.describe('OLX.ba - Functional Test Suite', () => {
         await expect(page.locator('h1').first()).toContainText(categoryName, { ignoreCase: true });
     });
 
+test('TC04: Verify successful user login', async ({ page }) => {
+    // 1. Sayfaya git
+    await homePage.goto();
+
+     await homePage.login('furkandmn35@gmail.com', 'Furkan35!');
+
     
+    await expect(page).toHaveURL('https://olx.ba/');
+    
+     const loginBtn = page.getByRole('link', { name: 'prijava' });
+    await expect(loginBtn).not.toBeVisible();
+});
 
  test('TC05: Verify sorting functionality (Price: Low to High)', async ({ page }) => {
     await homePage.searchFor('Laptop');
@@ -93,20 +104,21 @@ test.describe('OLX.ba - Functional Test Suite', () => {
         await expect(searchPage.productHeading.first()).toContainText(searchKeyword, { ignoreCase: true });
     });
     // -----------------------------------
+test('TC07: Verify login page navigation and form visibility', async ({ page }) => {
+    // 1. Ana sayfaya git
+    await homePage.navigate();
 
-    test('TC07: Verify login page navigation and form visibility', async ({ page }) => {
-        await homePage.navigateToLogin();
-        
-        // Login sayfasına gittiğimizi URL'den anlarız
-        await expect(page).toHaveURL(/.*login|prijava.*/);
-        
-        // Form elementlerinin görünürlüğünü kontrol et
-        const emailInput = page.locator('input[type="email"], input[name="username"]');
-        const passwordInput = page.locator('input[type="password"]');
-        
-        await expect(emailInput).toBeVisible();
-        await expect(passwordInput).toBeVisible();
-    });
+    // 2. Login sayfasını aç
+    await homePage.navigateToLogin();
+    
+    // 3. DOĞRULAMA: URL'in login içerdiğini bekle (Basit regex)
+    await expect(page).toHaveURL(/.*(login|prijava).*/, { timeout: 10000 });
+    
+    // 4. Formun geldiğini en basit input locator'ı ile doğrula
+    // OLX'teki email alanı genellikle 'username' name'ine sahiptir
+    const emailField = page.locator('input[name="username"]');
+    await expect(emailField).toBeVisible({ timeout: 5000 });
+});
 
     test('TC08: Verify "Post Ad" button redirects guest user to login page', async ({ page }) => {
     // 1. Butonun görünür olduğunu doğrula

@@ -33,28 +33,49 @@ export class SearchPage {
         this.locationFilterTrigger = page.locator('div, button').filter({ hasText: /^Lokacija$/ }).first();
         this.conditionNovoBtn = page.locator('label, button, span').filter({ hasText: /^Novo$/ }).first();
         this.resultCards = page.locator('a[href*="/artikal/"]');
-        // GÜNCEL LOCATOR (Senin gönderdiğin HTML'e göre):
-        // "label-wrap" class'ına sahip ve içinde "Sortiraj" yazan div
+     
         this.sortMenuTrigger = page.locator('div.label-wrap').filter({ hasText: 'Sortiraj' }).first();
 
         this.productHeading = page.locator('.main-heading');
         this.productPrice = page.locator('.smaller');
         this.noResultsMessage = page.locator('text=Nema rezultata');
         this.resultCards = page.locator('a[href*="/artikal/"]'); 
+
+
+        
        }
 
     async humanDelay(): Promise<void> {
         const delay = Math.floor(Math.random() * 800) + 400;
         await this.page.waitForTimeout(delay);
     }
-// pages/SearchPage_Functional.ts
+ 
+async setPriceRange(min: string, max: string): Promise<void> {
+    // 1. "Cijena" dropdown menüsünü aç
+    const priceDropdown = this.page.locator('div.label-wrap').filter({ hasText: 'Cijena' }).first();
+    await priceDropdown.click();
 
-// pages/SearchPage_Functional.ts
+    // 2. Input alanlarını bul
+    const minInput = this.page.locator('input[placeholder="od"]').first();
+    const maxInput = this.page.locator('input[placeholder="do"]').first();
+    
+    await minInput.waitFor({ state: 'visible' });
 
-// pages/SearchPage_Functional.ts
+    // 3. Sadece od ve do alanlarını doldur
+    await minInput.fill(min);
+    await maxInput.fill(max);
 
-  // pages/SearchPage_Functional.ts
+    // 4. Kısa bir bekleme (Sistemin girdiyi algılaması için)
+    await this.page.waitForTimeout(15000); 
 
+    const refreshButton = this.page.locator('button.refresh').filter({ hasText: 'Osvježi rezultate' });
+    await Promise.all([
+        this.page.waitForURL(url => url.href.includes(min), { timeout: 15000 }),
+        refreshButton.click({ force: true }) 
+    ]);
+    await this.page.waitForLoadState('networkidle');
+
+}
 async filterByNew(): Promise<void> {
     // 1. Filtre menüsünü aç
     const filterMenuTrigger = this.page.locator('div.label-wrap').filter({ hasText: 'Filteri oglasa' }).first();
