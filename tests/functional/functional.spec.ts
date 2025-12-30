@@ -8,24 +8,35 @@ test.describe('OLX.ba - Functional Test Suite', () => {
 
     test.beforeEach(async ({ page }) => {
         homePage = new HomePage(page);
-        searchPage = new SearchPage(page);
+        searchPage = new SearchPage(page); 
         
         await homePage.navigate();
         await homePage.handleCookies();
     });
 
-    test('TC01: Verify search suggestions appear when typing', async ({ page }) => {
-    const partialKeyword = 'Iphone';
+  test('TC01: Verify search suggestions appear when typing', async ({ page }) => {
+    const partialKeyword = 'iphone';
+
+    // 1. Arama kutusuna tıkla ve yazmaya başla
+    // pressSequentially kullanıyoruz çünkü gerçek kullanıcı gibi harf harf yazar, 
+    // bu da önerilerin tetiklenmesini sağlar.
     await homePage.searchInput.click();
     await homePage.searchInput.pressSequentially(partialKeyword, { delay: 150 });
 
-    // Öneriler kutusunun görünür olmasını bekle
-    const suggestionBox = page.locator('[class*="suggest"], .autocomplete-results').first();
-    await expect(suggestionBox).toBeVisible({ timeout: 10000 });
-    
-    // Önerilerin içinde aradığımız kelimenin geçtiğini doğrula
-    const firstSuggestion = suggestionBox.locator('div, li').first();
-    await expect(firstSuggestion).toContainText(partialKeyword, { ignoreCase: true });
+    // 2. "Prijedlozi pretrage" (Arama Önerileri) başlığının görünmesini bekle
+    await expect(homePage.suggestionsTitle).toBeVisible({ timeout: 10000 });
+
+    // 3. Listelenen önerilerin sayısını kontrol et
+    const suggestionCount = await homePage.searchSuggestionsList.count();
+    expect(suggestionCount).toBeGreaterThan(0);
+
+    // 4. İlk önerinin bizim yazdığımız kelimeyi içerdiğini doğrula
+    const firstSuggestionText = await homePage.searchSuggestionsList.first().textContent();
+    expect(firstSuggestionText?.toLowerCase()).toContain(partialKeyword);
+
+    // 5. Ekstra: Önerilerden birine tıklanabiliyor mu? (Opsiyonel)
+    // await homePage.searchSuggestionsList.first().click();
+    // await expect(page).toHaveURL(/.*pretraga.*/);
   });
 
     test('TC02: Verify search functionality returns results', async ({ page }) => {

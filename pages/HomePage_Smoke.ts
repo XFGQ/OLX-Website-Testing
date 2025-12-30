@@ -6,7 +6,7 @@ export class HomePage {
     readonly logo: Locator;
     readonly searchInput: Locator;
     readonly loginBtn: Locator;
-    readonly categoriesBtn: Locator;
+    readonly categoriesBtn: Locator; 
     readonly footerContainer: Locator;
     readonly copyrightText: Locator;
 

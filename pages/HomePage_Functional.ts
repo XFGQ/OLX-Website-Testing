@@ -11,7 +11,8 @@ export class HomePage {
     readonly copyrightText: Locator;
     readonly postAdButton: Locator;
     readonly searchSuggestions: Locator;
-    
+    readonly searchSuggestionsList: Locator;
+    readonly suggestionsTitle: Locator;
     
     constructor(page: Page) {
         this.page = page;
@@ -25,6 +26,9 @@ export class HomePage {
         this.copyrightText = page.locator('.footer-copyright p');
         this.postAdButton = page.locator('button').filter({ hasText: /Objavi oglas/i }).first();
         this.searchSuggestions = page.locator('.suggestions, .search-suggestions, [class*="suggestion"]');
+        // pages/HomePage_Functional.ts içine constructor'a ekleyin
+        this.searchSuggestionsList = page.locator('.lin-list .lin-row-text');
+        this.suggestionsTitle = page.locator('text=Prijedlozi pretrage');
     }
 
     /**
