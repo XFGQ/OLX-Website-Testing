@@ -1,6 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 import { HomePage } from "../../pages/HomePage_Functional";
 import { SearchPage } from "../../pages/SearchPage_Functional";
+
+let page: Page;
+
+test.beforeAll(async ({ browser }) => {
+	page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+	await page.close();
+});
 
 test.describe("OLX.ba - Functional Test Suite", () => {
 	let homePage: HomePage;

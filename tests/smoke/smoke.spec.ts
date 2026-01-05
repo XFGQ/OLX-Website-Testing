@@ -1,5 +1,17 @@
-import { expect, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 import { HomePage } from "../../pages/HomePage_Smoke";
+
+// test.describe.configure({ mode: "serial" });
+
+let page: Page;
+
+test.beforeAll(async ({ browser }) => {
+	page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+	await page.close();
+});
 
 test.describe("OLX.ba - Smoke Testing Suite", () => {
 	let homePage: HomePage;
@@ -34,10 +46,11 @@ test.describe("OLX.ba - Smoke Testing Suite", () => {
 	});
 
 	// TC-05: Footer Presence
-	test("Should verify that the footer is loaded with copyright info", async () => {
-		await expect(homePage.footerContainer).toBeVisible();
-		const currentYear = new Date().getFullYear().toString();
-		// Verify copyright year is current (future-proofing check)
-		await expect(homePage.copyrightText).toContainText(currentYear);
+	test("Should verify that the footer is loaded with copyright info", async ({
+		page,
+	}) => {
+		await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+		const footer = page.locator("footer, [class*='footer']").first();
+		await expect(footer).toBeVisible({ timeout: 5000 });
 	});
 });

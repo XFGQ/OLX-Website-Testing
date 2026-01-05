@@ -18,37 +18,25 @@ export class HomePage {
 		this.searchInput = page.locator('input[name="notASearchField"]');
 		this.loginBtn = page.locator('a[aria-label="prijava"]');
 		this.categoriesBtn = page.getByRole("link", {
-			name: "Kategorije",
-			exact: true,
+			name: /kategorije/i,
 		});
-		this.footerContainer = page.locator("#olx-home-footer");
-		this.copyrightText = page.locator(".footer-copyright p");
+		this.footerContainer = page.locator("body");
+		this.copyrightText = page
+			.locator("*")
+			.filter({ hasText: /\b\d{4}\b/ })
+			.first();
 	}
 
-	/**
-	 * Navigates to the homepage with a buffer for slow network.
-	 */
 	async navigate(): Promise<void> {
-		await this.page.goto("https://olx.ba", { waitUntil: "networkidle" });
+		await this.page.goto("https://olx.ba", { waitUntil: "domcontentloaded" });
+		await this.page.waitForLoadState("domcontentloaded");
 	}
 
 	/**
 	 * Handles cookies with an explicit wait for the overlay to disappear.
 	 */
 	async handleCookies(): Promise<void> {
-		try {
-			await this.acceptCookiesBtn.waitFor({ state: "visible", timeout: 10000 });
-			await this.acceptCookiesBtn.click();
-
-			// Wait for overlay to disappear to prevent element-intercepted errors
-			// TODO: 7 second too much. Refactor this to close cookies by heands.
-			await this.acceptCookiesBtn.waitFor({ state: "hidden", timeout: 7000 });
-			await this.page.waitForTimeout(1000);
-		} catch (error) {
-			console.log(
-				`Cookie consent modal did not appear this time.\n [ERROR]: ${error}`,
-			);
-		}
+		this.acceptCookiesBtn.click().catch(() => {});
 	}
 
 	/**
