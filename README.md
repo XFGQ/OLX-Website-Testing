@@ -1,6 +1,6 @@
 # SE302 Testing Project
 
-![Title](images/image4.png)
+![Title](images/image6.png)
 
 Playwright test suite for OLX.ba with functional and smoke tests.
 
